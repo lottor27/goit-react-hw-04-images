@@ -1,79 +1,80 @@
 import React from 'react';
-import { Component } from 'react';
-import { ToastContainer } from 'react-toastify';
-import Searchbar from './searchbar/searchbar';
+
+
+import Searchbar from './Searchbar/Searchbar';
 import fetchGallary from 'Services/GallaryApi';
-import { toast } from 'react-toastify';
+
 import ImageGallery from './ImageGallery/ImageGallery';
 import Button from './Button/Button';
 import Loader from './Loader/Loader';
 import Modal from './Modal/Modal';
+import { useState, useEffect, useRef } from 'react';
 
 
+const App =()=> {
 
-export default class App extends Component {
-  state = {
-    searchQuery: '',
-    results: null,
-    error: null,
-    page: 0,
-    showLoadMore: false,
-    showLoader: false,
-    showModal: false,
-    selectedImage: null,
-    galleryRef: React.createRef(),
+  const [searchQuery, setSearchQuery] = useState('')
+  const [results, setResults] = useState(null);
+  const [error, setErrors] = useState(null);
+  const [page, setPage] = useState(0);
+  const [showLoadMore, setShowLoadMore] = useState(false);
+  const [showLoader, setShowLoader] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const prevQuery = useRef(searchQuery);
+  const prevPage = useRef(page);
+
+  // useEffect(() => {
+  //   const fetchGallary = async () => {
+  //     setShowLoader(true);
+  //     try {
+  //       const data = await fetchImages(searchQuery, page);
+  //       const totalPage = Math.ceil(data.totalHits / 12);
+  //       setResults((prev) => [...prev, ...data.hits]);
+  //       setShowLoadMore(data.totalHits > 12 * page);
+  //       !data.totalHits && toast.error("No results found. Please try again!");
+  //       page >= totalPage && toast.warning("We're sorry, but you've reached the end of search results!");
+  //     } catch (error) {
+  //       // setError(error.message);
+  //       console.error(error.message);
+  //     } finally {
+  //       setShowLoader(false);
+  //     }
+  //   };
+
+  //   if (prevQuery.current !== searchQuery || prevPage.current !== page) fetchGallary();
+  // }, [page, searchQuery]);
+
+
+ const onFormSubmit = searchQueryOriginal => {
+    setSearchQuery(searchQueryOriginal);
+    setPage(1);
+    setResults([]);
+    
+ const onLoadMore = () => {
+    if (results) setPage((prev => { return prev + 1 }))
   }
 
-  async componentDidUpdate(prevProps, prevState) {
-    const prevQuery = prevState.searchQuery;
-    const nextQuery = this.state.searchQuery;
-    const prevPage = prevState.page;
-    const nextPage = this.state.page;
-
-    if (prevQuery !== nextQuery || prevPage !== nextPage) {
-      this.setState({ showLoader: true, error: null });
-      try {
-        const data = await fetchGallary(nextQuery, nextPage);
-        const totalPage = Math.ceil(data.totalHits / 12)
-        this.setState({
-          results: [...this.state.results, ...data.hits],
-          showLoadMore: data.totalHits > 12 * nextPage
-        });
-        !data.totalHits && toast.error("No results found. Please try again!");
-        nextPage >= totalPage && toast.warning("We're sorry, but you've reached the end of search results!");
-      } catch (error) {
-        this.setState({ error });
-      } finally {
-        this.setState({ showLoader: false })
-      }
-    }
-  }
-  onFormSubmit = searchQueryOriginal => {
-    this.setState({ searchQuery: searchQueryOriginal, page: 1, results: [] });
-  }
-  onLoadMore = () => {
-    if (this.state.results) {
-      this.setState(prevState => ({ page: prevState.page + 1 }));
-    }
-  }
-  handleKeydown = e => {
+ const handleKeydown = e => {
     if (e.code === 'Escape') {
-      this.setState({ showModal: false, selectedImage: null });
+      setShowModal(false);
+      setSelectedImage(null);
     }
   };
-  handleBackdropClick = e => {
-    if (e.target === e.currentTarget) {
-      this.setState({ showModal: false, selectedImage: null });
-    }
-  };
-  onOpenModal = imageId => {
-    const { results } = this.state;
-    const selectedImage = results.find(image => image.id === imageId);
-    this.setState({ selectedImage: selectedImage, showModal: true });
-  }; 
 
-  render() {
-    const { results, showLoadMore, showLoader, showModal, selectedImage, searchQuery } = this.state;
+ const handleBackdropClick = e => {
+    if (e.target === e.currentTarget) {
+      setShowModal(false);
+      setSelectedImage(null);
+    }
+  };
+
+ const onOpenModal = imageId => {
+    const selectedImage = results.find(image => image.id === imageId);
+    setShowModal(true);
+    setSelectedImage(selectedImage);
+  };
+
+
     return (
       <div className='App'>
         <ToastContainer 
@@ -81,19 +82,19 @@ export default class App extends Component {
         pauseOnHover 
         theme="colored" />
         <Searchbar 
-        onSubmit={this.onFormSubmit} />
+        onSubmit={onFormSubmit} />
         {searchQuery === '' && <h2 >Please enter a query to search for images!</h2>}
         {results && <ImageGallery 
         arrayResults={results} 
         key={results.id} 
-        onOpenModal={this.onOpenModal} />}
+        onOpenModal={onOpenModal} />}
         {showLoadMore && <Button 
-        handleClick={this.onLoadMore}><span>Load More</span></Button>}
+        handleClick={onLoadMore}><span>Load More</span></Button>}
         {showLoader && <Loader />}
         {showModal && (
           <Modal
-            onBackdropClose={this.handleBackdropClick}
-            onKeydownClose={this.handleKeydown}
+            onBackdropClose={handleBackdropClick}
+            onKeydownClose={handleKeydown}
           >
             <img src={selectedImage.largeImageURL} alt="imageSearch" />
           </Modal>
@@ -103,3 +104,5 @@ export default class App extends Component {
     
   }
 };
+
+export default App
