@@ -1,37 +1,35 @@
-import { Component } from 'react';
-
+import { useState } from 'react';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import PropTypes from 'prop-types';
 
 
-class Searchbar extends Component {
-    state = {
-        searchQueryOriginal: ''
+const Searchbar = ({onSubmit}) => {
+    
+    const [searchQueryOriginal, setSearchQueryOriginal]= useState('')
+   
+   const  handleChange = (e) => {
+    setSearchQueryOriginal( e.currentTarget.value.toLowerCase().trim() )
     }
 
-    handleChange = (e) => {
-        this.setState({ searchQueryOriginal: e.currentTarget.value.toLowerCase().trim() })
-    }
-
-    handleSubmit = (e) => {
+   const  handleSubmit = (e) => {
         e.preventDefault();
-        const { searchQueryOriginal } = this.state;
+        
         if (searchQueryOriginal === '') {
             toast.warning('Enter a search query!');
             return
         }
-        this.props.onSubmit(searchQueryOriginal)
-        this.setState({ searchQueryOriginal: '' });
+        onSubmit(searchQueryOriginal)
+        setSearchQueryOriginal('')
     }
  
 
     
 
-    render() {
+
         return (
             <header className="Searchbar" >
-                <form className="SearchForm" onSubmit={this.handleSubmit}>
+                <form className="SearchForm" onSubmit={handleSubmit}>
                     <button type="submit" className="SearchForm-button">
 
                     Search
@@ -42,14 +40,14 @@ class Searchbar extends Component {
                         autoComplete="off"
                         autoFocus
                         placeholder="Search images and photos"
-                        onChange={this.handleChange}
-                        value={this.state.searchQueryOriginal}
+                        onChange={handleChange}
+                        value={searchQueryOriginal}
                     />
                 </form>
             </header>
         )
     }
-}
+
 export default Searchbar;
 
 Searchbar.propTypes = {

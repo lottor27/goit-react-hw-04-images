@@ -1,4 +1,5 @@
 import { Rings } from  'react-loader-spinner'
+
 const Loader = () => {
 <Rings
   height="80"

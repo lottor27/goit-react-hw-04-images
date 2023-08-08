@@ -1,29 +1,35 @@
-import { Component } from "react";
+
+import { useEffect } from "react";
 
 import PropTypes from 'prop-types';
 
-class Modal extends Component {
+const Modal = ({children, onBackdropClose, onKeydownClose})=> {
     
-    componentDidMount() {
-        window.addEventListener('keydown', this.props.onKeydownClose);
-    }
-    componentWillUnmount() {
-        window.removeEventListener('keydown', this.props.onKeydownClose);
-    }
-    render() {
+
+    useEffect(() =>{
+        window.addEventListener('keydown', onKeydownClose);
+    }, [onKeydownClose]);
+    
+    useEffect(() =>{
+        window.removeEventListener('keydown', onKeydownClose);
+    }, [onKeydownClose]);
+
+
+    
+
         
         return (
             <div 
             id="modal-backdrop" className="Overlay" 
-            onClick={this.props.onBackdropClose}>
+            onClick={onBackdropClose}>
                 <div 
                 id="modal-window" className="Modal">
-                    {this.props.children}
+                    {children}
                 </div>
             </div>
         )
     }
-}
+
 export default Modal;
 
 Modal.propTypes = {
