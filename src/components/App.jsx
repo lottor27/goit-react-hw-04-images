@@ -1,6 +1,4 @@
 import React from 'react';
-
-
 import Searchbar from './Searchbar/Searchbar';
 import fetchGallary from 'Services/GallaryApi';
 import { ToastContainer, toast } from 'react-toastify';
@@ -11,11 +9,11 @@ import Modal from './Modal/Modal';
 import { useState, useEffect, useRef } from 'react';
 
 
+
 const App =()=> {
 
   const [searchQuery, setSearchQuery] = useState('')
   const [results, setResults] = useState(null);
-  const [error, setErrors] = useState(null);
   const [page, setPage] = useState(0);
   const [showLoadMore, setShowLoadMore] = useState(false);
   const [showLoader, setShowLoader] = useState(false);
