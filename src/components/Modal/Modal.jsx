@@ -6,13 +6,16 @@ import PropTypes from 'prop-types';
 const Modal = ({children, onBackdropClose, onKeydownClose})=> {
     
 
-    useEffect(() =>{
+    useEffect(() => {
         window.addEventListener('keydown', onKeydownClose);
     }, [onKeydownClose]);
     
-    useEffect(() =>{
-        window.removeEventListener('keydown', onKeydownClose);
-    }, [onKeydownClose]);
+    useEffect(() => {
+        return () => {
+            window.removeEventListener('keydown', onKeydownClose);
+        }
+    }, [onKeydownClose])
+
 
 
     
